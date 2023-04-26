@@ -42,13 +42,13 @@ def transcribe(request, group_id):
         if request.method == 'POST' and request.FILES['audio_file']:
             show = True
             try:
-                model = wp.load_model("base")
+                model = wp.load_model("small")
                 audio = request.FILES["audio_file"]
-                print(audio.size)
+                #print(audio.size)
                 fs = FileSystemStorage()
                 filename = fs.save(audio.name, audio)
                 name= audio.name
-                result = model.transcribe("media/" + name, language="es", fp16 = False)
+                result = model.transcribe("media/" + name, language="es", fp16 = False, verbose=True)
                 if os.path.exists('media/' + name):
                     os.remove('media/' + name)
                 return render(request,'transcribe.html', {'result': result, 'mensaje':'Este es el resultado de la transcripcion: ', 'show':show, "group_id": group_id})

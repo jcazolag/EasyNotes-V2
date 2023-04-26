@@ -1,17 +1,24 @@
+
 {% extends 'base.html' %}
 {% block content %}
-<div class="card mb-3">
-    <div class="row g-0">
-    <div class="col-md-8">
-    <div class="card-body">
-        <h5 class="card-title">{{ transcripcion.title }}</h5>
-        <p class="card-text">{{ transcripcion.transcripcion }}</p>
-        <p class="card-text">{{ transcripcion.date }}</p>
-        <hr />
-        <h3>Resumen</h3>
-        <p class="card-text">{{ resumen.resumen }}</p>
+<divid="detail">
+    <div class="card mb-3" >
+        <div class="row g-0">
+            <div class="col-md-12">
+                <div class="card-body" >
+                    <h5 class="card-title" align="center">{{ transcripcion.title }}</h5>
+                    <textarea disabled="true" rows="10" cols="167" id="detail_textarea">{{ transcripcion.transcripcion }}</textarea>
+                    <p class="card-text">{{ transcripcion.creation_date }}</p>
+                    <hr />
+                    {% if transcripcion.resumen == None %}
+                        
+                    {% else %}
+                    <h3>Resumen</h3>
+                    <p class="card-text">{{ transcripcion.resumen }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
- </div>
 </div>
 {% endblock content %}

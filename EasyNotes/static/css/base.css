@@ -1,0 +1,12 @@
+#body{ min-height: 100vh; margin:0; }
+
+/*header{ min-height:50px; background:lightcyan; }*/
+#footer{ min-height:50px;}
+
+/* The article fills all the space between header & footer */
+#body{ display:flex; flex-direction:column; }
+#div-content{ flex:1; }
+
+#div-content{
+    min-height: 100vh;
+}

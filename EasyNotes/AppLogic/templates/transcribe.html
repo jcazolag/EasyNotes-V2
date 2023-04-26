@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Transcribir</title>
+	<meta charset="utf-8">
+	<title>Transcribe</title>
 </head>
 <body>
 	{% extends 'base.html' %}
@@ -11,7 +12,7 @@
             <div>
                 <div class="card-body">
 					{% if show == False %}
-						<h3 class="card-title">Transcribe your audio files</h3>
+						<h3 class="card-title" align="center">Transcribe your audio files</h3>
 						{% if error %}
 						<div class="alert alert-danger mt-3" role="alert">
 							{{ error }}
@@ -20,13 +21,15 @@
 						<p class="card-text">
 						<form method="POST" enctype="multipart/form-data">
 							{% csrf_token %}
-							<input type="file" name="audio_file">
-							<button type="submit">Transcribe</button>
+							<input type="file" name="audio_file" align="center">
+							<br><br>
+							<button type="submit" class="btn btn-primary">Transcribe</button>
 						</form>
 						</p>
 					{% else %}
 						<div>
-							<p><h4>{{ mensaje }}</h4>{{ result.text }}</p>
+							<p><h4>{{ mensaje }}</h4></p>
+							<textarea disabled="true" rows="10" cols="167" id="detail_textarea">{{ result.text }}</textarea>
 						</div>
 						<hr>
 						<div class="card-body"> 
