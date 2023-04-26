@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>My groups</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+    {% extends 'base.html' %}
+	{% block content %}
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            <div v-for="New group" class="col"> 
+                <div class="card">  
+                    <div class="card-body"> 
+                        <a href="{% url 'newGroup' %}">
+                            <h5 class="card-title fw-bold">New group</h5> 
+                        </a>
+                        <p class="card-text">Add a new group</p> 
+                    </div> 
+                </div> 
+            </div> 
+            {% for group in groups %}
+            <div v-for="group in groups" class="col"> 
+                <div class="card">  
+                    <div class="card-body"> 
+                        <a href="{% url 'list' group.id %}">
+                            <h5 class="card-title fw-bold">{{ group.title }}</h5> 
+                        </a>
+                        <p class="card-text">{{ group.creation_date  }}</p> 
+                    </div> 
+                </div> 
+            </div> 
+            {% endfor %} 
+        </div>
+    {% endblock content%}
+    </body>
+</html>
