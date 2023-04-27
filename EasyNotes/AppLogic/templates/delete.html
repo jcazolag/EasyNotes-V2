@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h4 class="card-title" align="center">Delete</h4>
+    <hr>
+    <div class="card-body">
+        <div class="alert alert-danger" role="alert">
+            You are about to delete: "{{ object.title }}"
+        </div>
+        <div class="card-text">
+            {% if op == 'groups'  %}
+                {% if transcripciones %}
+                    <p><h5>This group contains this notes:</h5></p>
+                    <ul>
+                        {% for transcripcion in transcripciones %}
+                            <li>{{ transcripcion.title }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% else %}
+                {% if dates %}
+                    <p><h5>This Note contains this dates:</h5></p>
+                    <ul>
+                        {% for transcripcion in transcripciones%}
+                            <li>{{ transcripcion.title }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endif %}
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit"  class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

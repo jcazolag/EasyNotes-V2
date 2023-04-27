@@ -5,18 +5,25 @@
     <div class="card mb-3" >
         <div class="row g-0">
             <div class="col-md-12">
-                <div class="card-body" >
-                    <h5 class="card-title" align="center">{{ transcripcion.title }}</h5>
-                    <textarea disabled="true" rows="10" cols="167" id="detail_textarea">{{ transcripcion.transcripcion }}</textarea>
-                    <p class="card-text">{{ transcripcion.creation_date }}</p>
-                    <hr />
-                    {% if transcripcion.resumen == None %}
-                        
-                    {% else %}
-                    <h3>Resumen</h3>
-                    <p class="card-text">{{ transcripcion.resumen }}</p>
-                    {% endif %}
-                </div>
+                {% if op == "note" %}
+                    <div class="card-body" >
+                        <h5 class="card-title" align="center">{{ transcripcion.title }}</h5>
+                        <textarea disabled="true" rows="10" cols="167" id="detail_textarea">{{ transcripcion.transcripcion }}</textarea>
+                        <p class="card-text">{{ transcripcion.creation_date }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Summary</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="card-body" >
+                        <h5 class="card-title" align="center">Summary: {{ transcripcion.title }}</h5>
+                        <textarea disabled="true" rows="10" cols="167" id="detail_textarea">{{ transcripcion.resumen }}</textarea>
+                        <p class="card-text">{{ transcripcion.creation_date }}</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

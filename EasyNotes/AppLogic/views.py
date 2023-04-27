@@ -1,6 +1,7 @@
 from django.shortcuts import render
+import openai
 import whisper as wp
-from django.core.files.storage import FileSystemStorage
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -31,7 +32,8 @@ def newGroup(request):
 @login_required 
 def Notes(request, group_id):
     transcripciones = Transcripciones.objects.filter(group_id=group_id)
-    return render(request, 'notes.html', {'transcripciones': transcripciones, 'group_id': group_id})
+    group = get_object_or_404(MyGroups,pk=group_id)
+    return render(request, 'notes.html', {'transcripciones': transcripciones, 'group': group})
 
 @login_required 
 def transcribe(request, group_id):
@@ -69,12 +71,76 @@ def newNote(request, group_id, result):
 
 @login_required 
 def detail(request, transcripcion_id):
-    transcripcion = get_object_or_404(Transcripciones,pk=transcripcion_id)
-    return render(request, 'detail.html',{'transcripcion':transcripcion})
+    if request.method =="GET":
+        transcripcion = get_object_or_404(Transcripciones,pk=transcripcion_id)
+        return render(request, 'detail.html',{'transcripcion':transcripcion, 'op': 'note'})
+    else:
+        transcripcion = get_object_or_404(Transcripciones,pk=transcripcion_id)
+        if not transcripcion.resumen:
+            input_text= f"Resume el siguiente texto: \"{transcripcion.transcripcion}\" "
+            summary = chat(input_text)
+            print(summary)
+            transcripcion.save()
+            transcripcion.resumen=summary
+            transcripcion.save()
+            return render(request, 'detail.html',{'transcripcion':transcripcion, 'op':'summary'})
+        else:
+            return render(request, 'detail.html',{'transcripcion':transcripcion, 'op':'summary'})
 
+@login_required 
+def AdvOpt(request, object_id, op):
+    if op =="groups":
+         object = get_object_or_404(MyGroups,pk=object_id)
+    elif op=="notes":
+        object = get_object_or_404(Transcripciones,pk=object_id)
 
+    return render(request, 'advancedOptions.html',{'object':object, 'op': op})
 
+@login_required 
+def delete(request, object_id, op):
+    if request.method == "GET":
+        if op =="groups":
+            group = get_object_or_404(MyGroups,pk=object_id)
+            transcripciones = Transcripciones.objects.filter(group_id=object_id)
+            return render(request, 'delete.html',{'object':group, 'transcripciones': transcripciones, 'op': op})
+        elif op == "notes":
+            transcripcion = get_object_or_404(Transcripciones,pk=object_id)
+            dates = FechasImportantes.objects.filter(transcripcion_id=object_id)
+            return render(request, 'delete.html',{'object':transcripcion, 'dates':dates, 'op': op})
+    else:
+        if op =="groups":
+            group = get_object_or_404(MyGroups,pk=object_id)
+            group.delete()
+            return redirect('groups')
+        elif op == "notes":
+            transcripcion = get_object_or_404(Transcripciones,pk=object_id)
+            group = transcripcion.group_id
+            transcripcion.delete()
+            return redirect('list', group_id=group)
 
-
-
-    
+@login_required 
+def update(request, object_id, op):
+    if request.method == "GET":
+        if op =="groups":
+            group = get_object_or_404(MyGroups,pk=object_id)
+            return render(request, 'update.html',{'object':group, 'op': op})
+        elif op == "notes":
+            transcripcion = get_object_or_404(Transcripciones,pk=object_id)
+            return render(request, 'update.html',{'object':transcripcion, 'op': op})
+    else:
+        if op =="groups":
+            print("working progress")
+            return redirect('groups')
+        elif op == "notes":
+            print("working progress")
+            return redirect('groups')
+        
+def chat(text):
+    input_text = text
+    #print("este es el input text: " + input_text)
+    openai.api_key = "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"
+    completions = openai.ChatCompletion.create(
+    model = "gpt-3.5-turbo-0301",
+    messages=[{"role": "user", "content": input_text}])
+    output_text = completions.choices[0].message.content
+    return output_text

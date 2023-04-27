@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <h4 class="card-title" align="center">Update</h4>
+    <hr>
+    <div class="card-body">
+        <div class="alert alert-warning" role="alert">
+            You are about to update: "{{ object.title }}"
+        </div>
+        <div class="card-text">
+            <form method="POST">
+                {% if op == 'groups'  %}
+                
+                {% else %}
+                    
+                {% endif %}
+                {% csrf_token %}
+                <button type="submit"  class="btn btn-warning">Update</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
