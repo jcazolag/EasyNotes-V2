@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import openai
 import whisper as wp
+from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -59,11 +60,11 @@ def transcribe(request, group_id):
 @login_required 
 def newNote(request, group_id, result):
     if request.method == 'GET':
-        return render(request, 'newNote.html', {"group_id": group_id, "result": result, "mensaje": 'Transcription: '})
+        return render(request, 'newNote.html', {"result": result, "mensaje": 'Transcription: '})
     else:
         if request.method == 'POST':
             try:
-                model = Transcripciones(title=request.POST.get("title"),transcripcion=result, group_id=group_id)
+                model = Transcripciones(title=request.POST.get("title"),transcripcion=result, group_id=group_id,user_id=request.user.id)
                 model.save()
                 return redirect('list', group_id=group_id)
             except Exception as e:
@@ -79,8 +80,6 @@ def detail(request, transcripcion_id):
         if not transcripcion.resumen:
             input_text= f"Resume el siguiente texto: \"{transcripcion.transcripcion}\" "
             summary = chat(input_text)
-            print(summary)
-            transcripcion.save()
             transcripcion.resumen=summary
             transcripcion.save()
             return render(request, 'detail.html',{'transcripcion':transcripcion, 'op':'summary'})
@@ -129,16 +128,25 @@ def update(request, object_id, op):
             return render(request, 'update.html',{'object':transcripcion, 'op': op})
     else:
         if op =="groups":
-            print("working progress")
+            group = get_object_or_404(MyGroups,pk=object_id)
+            title = request.POST["title"]
+            group.title= title
+            group.save()
             return redirect('groups')
         elif op == "notes":
+            transcripcion = get_object_or_404(Transcripciones,pk=object_id)
+            title = request.POST["title"]
+            note = request.POST["note"]
+            transcripcion.title= title
+            transcripcion.transcripcion= note
+            transcripcion.save()
             print("working progress")
-            return redirect('groups')
+            return redirect('list', group_id=transcripcion.group_id)
         
 def chat(text):
     input_text = text
     #print("este es el input text: " + input_text)
-    openai.api_key = "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"
+    openai.api_key = "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"
     completions = openai.ChatCompletion.create(
     model = "gpt-3.5-turbo-0301",
     messages=[{"role": "user", "content": input_text}])

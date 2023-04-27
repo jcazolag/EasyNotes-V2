@@ -1,4 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1 align="center">Welcome to home page</h1>
+<h1 align="center">EasyNotes</h1>
+<hr>
+{% if user.is_authenticated and op %}
+    <div class="card mb-3" >
+        <div class="row g-0">
+            <div class="col-md-12">
+                <div class="card-header">
+                    <h5 class="card-title" align="center">Latest group </h5>
+                </div>
+                <div class="card-body" >
+                    <a href="{% url 'list' group.id %}">
+                        <h5 class="card-title fw-bold">{{ group.title }}</h5> 
+                    </a>
+                    <p class="card-text">{{ group.creation_date  }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3" >
+        <div class="row g-0">
+            <div class="col-md-12">
+                <div class="card-header">
+                    <h5 class="card-title" align="center">Latest Note</h5>
+                </div>
+                <div class="card-body" >
+                    <a href="{% url 'detail' note.id %}">
+                        <h5 class="card-title fw-bold">{{ note.title }}</h5> 
+                    </a>
+                    <p class="card-text">{{ note.creation_date  }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% elif user.is_authenticated and not op %}
+    <h5>You do not have any item</h5>
+{% else %}
+{% endif %}
 {% endblock content %}

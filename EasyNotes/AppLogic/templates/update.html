@@ -10,12 +10,35 @@
         <div class="card-text">
             <form method="POST">
                 {% if op == 'groups'  %}
-                
+                <div class="container" align="center">
+                   <form method="POST">
+                    {% csrf_token %}
+                    <label for="title">Title</label>
+                    <br>
+                    <input type="text" id="title" name="title" value="{{ object.title }}"></input>
+                    <br><br>
+                    <hr>
+                    <button type="submit"  class="btn btn-warning">Update</button>  
+                </form> 
+                </div>
                 {% else %}
-                    
+                <div class="container" align="center">
+                    <form method="POST">
+                     {% csrf_token %}
+                     <label for="title">Title</label>
+                     <br>
+                     <input type="text" id="title" name="title" value="{{ object.title }}"></input>
+                     <br><br>
+                     <label for="note">Note</label>
+                     <br>
+                     <textarea  rows="10" cols="167" id="note" name="note">{{ object.transcripcion }}</textarea>
+                     <hr>
+                     <button type="submit"  class="btn btn-warning">Update</button>  
+                 </form> 
+                 </div>
                 {% endif %}
-                {% csrf_token %}
-                <button type="submit"  class="btn btn-warning">Update</button>
+                
+                <!--<button type="submit"  class="btn btn-warning">Update</button>-->
             </form>
         </div>
     </div>
