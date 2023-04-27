@@ -77,14 +77,31 @@ def detail(request, transcripcion_id):
         return render(request, 'detail.html',{'transcripcion':transcripcion, 'op': 'note'})
     else:
         transcripcion = get_object_or_404(Transcripciones,pk=transcripcion_id)
-        if not transcripcion.resumen:
-            input_text= f"Resume el siguiente texto: \"{transcripcion.transcripcion}\" "
-            summary = chat(input_text)
-            transcripcion.resumen=summary
-            transcripcion.save()
-            return render(request, 'detail.html',{'transcripcion':transcripcion, 'op':'summary'})
-        else:
-            return render(request, 'detail.html',{'transcripcion':transcripcion, 'op':'summary'})
+        if 'summary' in request.POST:
+            if not transcripcion.resumen:
+                input_text= f"Resume el siguiente texto: \"{transcripcion.transcripcion}\" "
+                summary = chat(input_text)
+                transcripcion.resumen=summary
+                transcripcion.save()
+                return render(request, 'detail.html',{'transcripcion':transcripcion, 'op':'summary'})
+            else:
+                return render(request, 'detail.html',{'transcripcion':transcripcion, 'op':'summary'})
+        elif 'date' in request.POST:
+            print("date")
+            dates = FechasImportantes.objects.filter(transcripcion_id=transcripcion_id)
+            print(dates)
+            if dates:
+                print("date 1")
+                dates = get_object_or_404(FechasImportantes,transcripcion_id=transcripcion_id)
+                return render(request, 'detail.html',{'transcripcion':transcripcion, 'dates':dates, 'op':'dates'})
+            else:
+                print("date 2")
+                input_text= f"Del siguiente texto saca las fechas de examenes, tareas, actividades o eventos propuestos y dame una descripcion de dicho examen, tarea, actividad o evento; en caso de no haber, unicamente dime 'No se encontraron fechas': \"{transcripcion.transcripcion}\" "
+                result = chat(input_text)
+                model = FechasImportantes(description=result,transcripcion_id = transcripcion_id,user_id=request.user.id, due_date=None)
+                model.save()
+                dates = get_object_or_404(FechasImportantes,transcripcion_id=transcripcion_id)
+                return render(request, 'detail.html',{'transcripcion':transcripcion, 'dates':dates, 'op':'dates'})
 
 @login_required 
 def AdvOpt(request, object_id, op):
@@ -146,7 +163,7 @@ def update(request, object_id, op):
 def chat(text):
     input_text = text
     #print("este es el input text: " + input_text)
-    openai.api_key = "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"
+    openai.api_key = "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"
     completions = openai.ChatCompletion.create(
     model = "gpt-3.5-turbo-0301",
     messages=[{"role": "user", "content": input_text}])

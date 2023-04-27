@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h4 class="card-title" align="center">Delete</h4>
-    <hr>
+    <h4 class="card-title" align="center">Delete: {{ object.title }}</h4>
     <div class="card-body">
         <div class="alert alert-danger" role="alert">
             You are about to delete: "{{ object.title }}"
@@ -28,10 +27,12 @@
                 {% endif %}
             {% endif %}
             <hr>
-            <form method="POST">
-                {% csrf_token %}
-                <button type="submit"  class="btn btn-danger">Delete</button>
-            </form>
+            <div class="container" align="center">
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit"  class="btn btn-danger">Delete</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

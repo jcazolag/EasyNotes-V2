@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="card">
-    <h4 class="card-title" align="center">Update</h4>
-    <hr>
+    <h4 class="card-title" align="center">Update: {{ object.title }}</h4>
     <div class="card-body">
         <div class="alert alert-warning" role="alert">
             You are about to update: "{{ object.title }}"
@@ -31,14 +30,12 @@
                      <br><br>
                      <label for="note">Note</label>
                      <br>
-                     <textarea  rows="10" cols="167" id="note" name="note">{{ object.transcripcion }}</textarea>
+                     <textarea  style="width:100%; height: 200px" id="note" name="note">{{ object.transcripcion }}</textarea>
                      <hr>
                      <button type="submit"  class="btn btn-warning">Update</button>  
                  </form> 
                  </div>
                 {% endif %}
-                
-                <!--<button type="submit"  class="btn btn-warning">Update</button>-->
             </form>
         </div>
     </div>

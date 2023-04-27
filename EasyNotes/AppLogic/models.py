@@ -17,7 +17,7 @@ class Transcripciones(models.Model):
 class FechasImportantes(models.Model):
     description = models.TextField()
     creation_date = models.DateTimeField(auto_now_add=True)
-    due_date = models.DateTimeField()
+    due_date = models.DateTimeField(null=True,blank=True)
     user = models.ForeignKey(User, null=True,on_delete=models.CASCADE)
     transcripcion = models.ForeignKey(Transcripciones, null=True,on_delete=models.CASCADE)
     

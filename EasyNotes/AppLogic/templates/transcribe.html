@@ -27,14 +27,16 @@
 						</form>
 						</p>
 					{% else %}
-						<div>
+						<div class="container">
 							<p><h4>{{ mensaje }}</h4></p>
-							<textarea disabled="true" rows="10" cols="167" id="detail_textarea">{{ result.text }}</textarea>
+							<textarea disabled="True"  style="width:100%; height: 200px" id="detail_textarea">{{ result.text }}</textarea>
 						</div>
 						<hr>
-						<div class="card-body"> 
+						<div class="container" align="center"> 
 							<a href="{% url 'newNote' group_id result.text %}">
-								<h5 class="card-title fw-bold">Create new Note</h5> 
+								<button type="button" class="btn btn-primary">
+									Create new Note
+								</button> 
 							</a> 
 						</div>
 					{% endif%}
