@@ -1,23 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="card">
-    <div class="card-title">
-       <h4 class="card-title" align="center">Options: {{ object.title }}</h4> 
-    </div>
-    <div class="card-body">
-        <h5>Creation date: {{ object.creation_date }}</h5>
-    </div>
-    <div class="card-footer">
-            <a href="{% url 'update' object_id=object.id op=op %}">
-                <button type="button" class="btn btn-primary">
-                    Update
-                </button>
-            </a>
-            <a href="{% url 'delete' object_id=object.id op=op %}">
-                <button type="button" class="btn btn-primary">
-                    Delete
-                </button>
-            </a>
+<div class="container">
+    <div class="card">
+        <div class="card-title">
+        <h4 class="card-title" align="center">Options: {{ object.title }}</h4> 
         </div>
+        <div class="card-body">
+            <h5>Creation date: {{ object.creation_date }}</h5>
+        </div>
+        <div class="card-footer">
+                <a href="{% url 'update' object_id=object.id op=op %}">
+                    <button type="button" class="btn btn-primary">
+                        Update
+                    </button>
+                </a>
+                <a href="{% url 'delete' object_id=object.id op=op %}">
+                    <button type="button" class="btn btn-primary">
+                        Delete
+                    </button>
+                </a>
+            </div>
+    </div>
 </div>
 {% endblock content %}

@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<title>Transcribe</title>
-</head>
-<body>
-	{% extends 'base.html' %}
-	{% block content %}
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
 	<div class="card mb-3">
-        <div class="row g-0">
-            <div>
-                <div class="card-body">
+		<div class="row g-0">
+			<div>
+				<div class="card-body">
 					{% if show == False %}
 						<h3 class="card-title" align="center">Transcribe your audio files</h3>
 						{% if error %}
@@ -21,7 +15,7 @@
 						<p class="card-text">
 						<form method="POST" enctype="multipart/form-data">
 							{% csrf_token %}
-							<input type="file" name="audio_file" align="center">
+							<input type="file" id ="audio_file" name="audio_file" accept="audio/mp3, audio/wav"  align="center">
 							<br><br>
 							<button type="submit" class="btn btn-primary">Transcribe</button>
 						</form>
@@ -44,6 +38,5 @@
 			</div>
 		</div>
 	</div>
-	{% endblock content %}
-</body>
-</html>
+</div>
+{% endblock content %}

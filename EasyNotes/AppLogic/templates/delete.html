@@ -16,14 +16,12 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-            {% else %}
+            {% elif op == "notes" %}
                 {% if dates %}
-                    <p><h5>This Note contains this dates:</h5></p>
-                    <ul>
-                        {% for transcripcion in transcripciones%}
-                            <li>{{ transcripcion.title }}</li>
-                        {% endfor %}
-                    </ul>
+                    {% if dates.description != "No se encontraron fechas." %}
+                        <p><h5>This Note contains this dates:</h5></p>
+                        <textarea disabled="true" style="width:100%; height: 200px" id="detail_textarea">{{ dates.description }}</textarea>
+                    {% endif %}
                 {% endif %}
             {% endif %}
             <hr>

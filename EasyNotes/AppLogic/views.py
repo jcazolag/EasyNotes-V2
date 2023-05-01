@@ -41,22 +41,28 @@ def transcribe(request, group_id):
     show = False
     if request.method == 'GET':
         return render(request, 'transcribe.html',{'show': show})
-    else:
-        if request.method == 'POST' and request.FILES['audio_file']:
+    elif request.method == 'POST':
+        if not "audio_file" in request.FILES:   
+            return render(request, 'transcribe.html', {'error': 'Selecciona un archivo de audio', 'show':show})
+        else:
+            audio = request.FILES["audio_file"]
             show = True
             try:
-                model = wp.load_model("small")
-                audio = request.FILES["audio_file"]
-                #print(audio.size)
+                
+                print(audio.size)
                 fs = FileSystemStorage()
-                filename = fs.save(audio.name, audio)
-                name= audio.name
-                result = model.transcribe("media/" + name, language="es", fp16 = False, verbose=True)
+                name = audio.name
+                filename = fs.save(name, audio)
+                result = whisper(name)
+
                 if os.path.exists('media/' + name):
                     os.remove('media/' + name)
+                
                 return render(request,'transcribe.html', {'result': result, 'mensaje':'Este es el resultado de la transcripcion: ', 'show':show, "group_id": group_id})
             except Exception as e:
-                return render(request, 'transcribe.html', {'error': e})
+                print(e)
+        
+
 @login_required 
 def newNote(request, group_id, result):
     if request.method == 'GET':
@@ -87,21 +93,25 @@ def detail(request, transcripcion_id):
             else:
                 return render(request, 'detail.html',{'transcripcion':transcripcion, 'op':'summary'})
         elif 'date' in request.POST:
-            print("date")
+            #print("date")
             dates = FechasImportantes.objects.filter(transcripcion_id=transcripcion_id)
-            print(dates)
+            #print(dates)
             if dates:
-                print("date 1")
+                #print("date 1")
                 dates = get_object_or_404(FechasImportantes,transcripcion_id=transcripcion_id)
                 return render(request, 'detail.html',{'transcripcion':transcripcion, 'dates':dates, 'op':'dates'})
             else:
-                print("date 2")
-                input_text= f"Del siguiente texto saca las fechas de examenes, tareas, actividades o eventos propuestos y dame una descripcion de dicho examen, tarea, actividad o evento; en caso de no haber, unicamente dime 'No se encontraron fechas': \"{transcripcion.transcripcion}\" "
+                #print("date 2")
+                input_text= f"Del siguiente texto saca las fechas de examenes, tareas, actividades o eventos propuestos y dame una descripcion de dicho examen, tarea, actividad o evento: \"{transcripcion.transcripcion}\" \n\nEn caso de no haber, unicamente dime 'No se encontraron fechas' "
                 result = chat(input_text)
                 model = FechasImportantes(description=result,transcripcion_id = transcripcion_id,user_id=request.user.id, due_date=None)
                 model.save()
                 dates = get_object_or_404(FechasImportantes,transcripcion_id=transcripcion_id)
                 return render(request, 'detail.html',{'transcripcion':transcripcion, 'dates':dates, 'op':'dates'})
+        elif 'study_material' in request.POST:
+            input_text= f"Dame o recomiendame material de estudio tales como libros, articulos o videos que esten relacionados con el tema de estudio del siguiente texto: \"{transcripcion.transcripcion}\" \nCon el siguiente formato:'El material de estudio recomendado es: - Libros: \n- Articulos: \n- Videos: ' \n\nSi no hay un tema de estudio respondeme con: 'No se puede sugerir material de estudio para este texto' \n\nsi hay varios temas de estudio, dame los materiales de estudio para cada tema de forma separada, pero con el mismo formato para cada tema. "
+            result = chat(input_text)
+            return render(request, 'detail.html',{'transcripcion':transcripcion, 'material':result, 'op':'study_material'})
 
 @login_required 
 def AdvOpt(request, object_id, op):
@@ -121,8 +131,12 @@ def delete(request, object_id, op):
             return render(request, 'delete.html',{'object':group, 'transcripciones': transcripciones, 'op': op})
         elif op == "notes":
             transcripcion = get_object_or_404(Transcripciones,pk=object_id)
-            dates = FechasImportantes.objects.filter(transcripcion_id=object_id)
-            return render(request, 'delete.html',{'object':transcripcion, 'dates':dates, 'op': op})
+            dates = FechasImportantes.objects.filter(transcripcion_id=transcripcion.id)
+            if dates:
+                date = dates[0]
+            else:
+                date=None
+            return render(request, 'delete.html',{'object':transcripcion, 'dates':date, 'op': op})
     else:
         if op =="groups":
             group = get_object_or_404(MyGroups,pk=object_id)
@@ -163,9 +177,27 @@ def update(request, object_id, op):
 def chat(text):
     input_text = text
     #print("este es el input text: " + input_text)
-    openai.api_key = "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"
+    openai.api_key = "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"
     completions = openai.ChatCompletion.create(
     model = "gpt-3.5-turbo-0301",
     messages=[{"role": "user", "content": input_text}])
     output_text = completions.choices[0].message.content
     return output_text
+
+def whisper(name):
+    print("WHISPER")
+    #audio_path = audio_file + name
+    model = wp.load_model("small")
+    # load audio and pad/trim it to fit 30 seconds
+    audio = wp.load_audio('media/' + name)
+    audio = wp.pad_or_trim(audio)
+    # make log-Mel spectrogram and move to the same device as the model
+    mel = wp.log_mel_spectrogram(audio).to(model.device)
+    # detect the spoken language
+    _, probs = model.detect_language(mel)
+    print(f"Detected language: {max(probs, key=probs.get)}")
+    # decode the audio
+    options = wp.DecodingOptions(fp16=False)
+    result = wp.decode(model, mel, options)
+    # print the recognized text
+    return result
