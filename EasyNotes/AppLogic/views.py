@@ -177,7 +177,7 @@ def update(request, object_id, op):
 def chat(text):
     input_text = text
     #print("este es el input text: " + input_text)
-    openai.api_key = "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"
+    openai.api_key = "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"
     completions = openai.ChatCompletion.create(
     model = "gpt-3.5-turbo-0301",
     messages=[{"role": "user", "content": input_text}])
